@@ -208,7 +208,7 @@ async def anon(rq: str, rsp: str) -> tuple[str, str, str]:
 
 async def main():
     results = []
-    for _, row in df[:10].iterrows():
+    for _, row in df.iterrows():
         point = await anon(row["request"], row["response"])
         results.append(point)
         if len(results) % 10 == 0:

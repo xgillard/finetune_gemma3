@@ -26,7 +26,7 @@ from transformers import (
 output_dir    = "Llama-3.2-3B-Instruct-arkey_emails-qlora"
 modelname     = "meta-llama/Llama-3.2-3B-Instruct"
 epochs        = 5
-dset_path     = "./resources/mails_dataset.csv"
+dset_path     = "./anonymized.csv"
 batch_size    = 32
 accumulation  = 10     # virtual batches of 320 samples
 checkpointing = False  # true si besoin de plus de ram.
