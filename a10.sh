@@ -11,7 +11,7 @@
 ## MORE INFO HERE:
 ## https://www.cism.ucl.ac.be/doc/_contents/Computing/index.html?highlight=gpu#manneback-cluster
 #SBATCH --ntasks=1
-#SBATCH --gres="gpu:TeslaA10:1"
+#SBATCH --gres="gpu:TeslaA100:1"
 #SBATCH --mem-per-cpu=102400 # 100GB
 #SBATCH --partition=gpu
 #SBATCH --mail-user=xavier.gillard@uclouvain.be

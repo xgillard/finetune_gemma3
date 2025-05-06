@@ -32,6 +32,12 @@ max_length = 1000
 df = pd.read_csv(dataset)  # noqa: PD901
 df = df[ (df["request"].str.len() <= max_length) & (df["response"].str.len() <= max_length) ]  # noqa: PD901
 
+try:
+    prev = pd.read_csv("anonymized.csv")
+    df   = df[len(prev):]
+except:
+    pass
+
 ### MODEL #####################################################################
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True,
