@@ -51,6 +51,8 @@ langchain-community = "^0.3.23"
 langchain-chroma = "^0.2.3"
 langchain-huggingface = "^0.1.2"
 
+chroma = "^0.2.0"
+
 ############################ RUFF ####################################
 [tool.ruff]
 # global built-in configuration

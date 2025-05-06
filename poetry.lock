@@ -563,6 +563,16 @@ files = [
 ]
 
 [[package]]
+name = "chroma"
+version = "0.2.0"
+description = "Color handling made simple."
+optional = false
+python-versions = "*"
+files = [
+    {file = "Chroma-0.2.0.tar.gz", hash = "sha256:e265bcd503e2b35c4448b83257467166c252ecf3ab610492432780691cdfb286"},
+]
+
+[[package]]
 name = "chroma-hnswlib"
 version = "0.7.6"
 description = "Chromas fork of hnswlib"
@@ -5028,4 +5038,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "7b1a569df5fb5c7ca24b322f579f9710ff7458f28a94f61b97ec0bb296ee398c"
+content-hash = "32779fbeca2546242376cd22babf0e1631c02d3302a02cc6115bc7dcc7fe1e8f"
