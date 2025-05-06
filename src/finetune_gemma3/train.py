@@ -77,6 +77,10 @@ def tokenize(sample):  # noqa: ANN001, ANN201
 dataset = Dataset.from_csv("./resources/mails_dataset.csv")
 dataset = dataset.map(tokenize, batched=False)
 
+shards  = dataset.shuffle(seed=42).train_test_split(test_size=0.2)
+trainds = shards["train"]
+evalds  = shards["test"]
+
 ##### ACTUAL FINETUNING #######################################################
 args  = TrainingArguments(
     output_dir                  = output_dir,
@@ -94,7 +98,8 @@ args  = TrainingArguments(
 trainer = Trainer(
     model,
     args,
-    train_dataset=dataset,
+    train_dataset=trainds,
+    eval_dataset=evalds,
     data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
 )
 
