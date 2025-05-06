@@ -65,7 +65,7 @@ chat = ChatHuggingFace(llm=llm)
 
 ### VECTOR DB #################################################################
 __DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-__DIGITA = "/home/xgillard/REPO/rag/agr/notebooks/digita"
+__DIGITA = "/home/ucl/pcom/gillardx/finetune_gemma3/resources/digita"
 
 # The FAQ database
 FAQ = Chroma(
