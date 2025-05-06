@@ -5,18 +5,18 @@
 ###
 
 # Submission script for Manneback
-#SBATCH --job-name=finetune-llama
-#SBATCH --time=05:00:00 # hh:mm:ss
+#SBATCH --job-name=anonymize
+#SBATCH --time=20:00:00 # hh:mm:ss
 #
 ## MORE INFO HERE:
 ## https://www.cism.ucl.ac.be/doc/_contents/Computing/index.html?highlight=gpu#manneback-cluster
-#SBATCH --ntasks=2
+#SBATCH --ntasks=1
 #SBATCH --gres="gpu:TeslaA100:1"
 #SBATCH --mem-per-cpu=102400 # 100GB
 #SBATCH --partition=gpu
 #SBATCH --mail-user=xavier.gillard@uclouvain.be
 #SBATCH --mail-type=ALL
-#SBATCH --output=a100.txt
+#SBATCH --output=out.txt
 
 module --force purge
 module --ignore_cache load              \
@@ -28,5 +28,5 @@ module --ignore_cache load              \
 . .venv/bin/activate
 poetry config virtualenvs.options.system-site-packages true --local
 srun poetry run python -m finetune_gemma3.anonymize
-srun poetry run python -m finetune_gemma3.train
+#srun poetry run python -m finetune_gemma3.train
 

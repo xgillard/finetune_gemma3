@@ -28,15 +28,8 @@ modelname  = "meta-llama/Llama-3.2-3B-Instruct"
 dataset    = "./resources/mails_dataset_trim.csv"
 max_length = 1000
 
-
 df = pd.read_csv(dataset)  # noqa: PD901
 df = df[ (df["request"].str.len() <= max_length) & (df["response"].str.len() <= max_length) ]  # noqa: PD901
-
-try:
-    prev = pd.read_csv("anonymized.csv")
-    df   = df[len(prev):]
-except:
-    pass
 
 ### MODEL #####################################################################
 bnb_config = BitsAndBytesConfig(
@@ -213,16 +206,8 @@ async def anon(rq: str, rsp: str) -> tuple[str, str, str]:
 
 
 async def main():
-    results = []
-    for _, row in df.iterrows():
-        point = await anon(row["request"], row["response"])
-        results.append(point)
-        if len(results) % 10 == 0:
-            # checkpoint
-            out = pd.DataFrame.from_records(results, columns=["request", "response", "context"])
-            out.to_csv("anonymized.csv")
-    # save final dataset
-    out = pd.DataFrame.from_records(results, columns=["request", "response", "context"])
+    results = await asyncio.gather(*(anon(row["request"], row["response"]) for _, row in df.iterrows()))
+    out     = pd.DataFrame.from_records(results, columns=["request", "response", "context"])
     out.to_csv("anonymized.csv")
 
 if __name__ == "__main__":
