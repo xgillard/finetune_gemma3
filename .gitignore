@@ -1,3 +1,5 @@
 .venv
 resources
 **/__pycache__
+out.txt
+a100.txt
