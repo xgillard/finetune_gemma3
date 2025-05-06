@@ -68,8 +68,8 @@ model = get_peft_model(model, lora)
 def tokenize(sample):  # noqa: ANN001, ANN201
     """Turn sample into a prompt."""
     messages = [
-        {"role": "system", "content": "Respond to this user email."},
-        {"role": "user",   "content": sample["request"]},
+        {"role": "system", "content": "Respond to this user email using the given pieces of information only."},
+        {"role": "user",   "content": f"{sample['request']}\n\n\n# Information you can use:\n{sample['context']}"},
         {"role": "assistant", "content": sample["response"]},
     ]
     return tokenizer.apply_chat_template(messages, tokenize=True, return_dict=True, return_tensors=None)
