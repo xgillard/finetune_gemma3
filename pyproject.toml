@@ -38,6 +38,13 @@ bitsandbytes = ">=0.45.5,<0.46.0"
 peft         = ">=0.15.2,<0.16.0"
 trl          = ">=0.17.0,<0.18.0"
 
+## langchain
+langchain = "^0.3.25"
+langchain-core = "^0.3.58"
+langchain-community = "^0.3.23"
+langchain-chroma = "^0.2.3"
+langchain-huggingface = "^0.1.2"
+
 ############################ RUFF ####################################
 [tool.ruff]
 # global built-in configuration
