@@ -74,7 +74,7 @@ def tokenize(sample):  # noqa: ANN001, ANN201
     ]
     return tokenizer.apply_chat_template(messages, tokenize=True, return_dict=True, return_tensors=None)
 
-dataset = Dataset.from_csv("./resources/mails_dataset.csv")
+dataset = Dataset.from_csv(dset_path)
 dataset = dataset.map(tokenize, batched=False)
 
 shards  = dataset.shuffle(seed=42).train_test_split(test_size=0.1)

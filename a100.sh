@@ -5,7 +5,7 @@
 ###
 
 # Submission script for Manneback
-#SBATCH --job-name=anonymize
+#SBATCH --job-name=finetune
 #SBATCH --time=20:00:00 # hh:mm:ss
 #
 ## MORE INFO HERE:
@@ -27,6 +27,6 @@ module --ignore_cache load              \
 
 . .venv/bin/activate
 poetry config virtualenvs.options.system-site-packages true --local
-srun poetry run python -m finetune_gemma3.anonymize
-#srun poetry run python -m finetune_gemma3.train
+#srun poetry run python -m finetune_gemma3.anonymize
+srun poetry run python -m finetune_gemma3.train
 
