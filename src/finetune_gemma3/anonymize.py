@@ -26,6 +26,10 @@ logging.getLogger("transformers").setLevel(logging.WARNING)
 
 modelname  = "meta-llama/Llama-3.2-3B-Instruct"
 dataset    = "./resources/mails_dataset_trim.csv"
+#__DIGITA   = "/home/ucl/pcom/gillardx/finetune_gemma3/resources/digita"
+__DIGITA   = "./resources/digita"
+__DEVICE   = "cuda" if torch.cuda.is_available() else "cpu"
+
 max_length = 1000
 
 df = pd.read_csv(dataset)  # noqa: PD901
@@ -63,9 +67,6 @@ llm  = HuggingFacePipeline(pipeline=pipe, model_id=modelname)
 chat = ChatHuggingFace(llm=llm)
 
 ### VECTOR DB #################################################################
-__DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-__DIGITA = "/home/ucl/pcom/gillardx/finetune_gemma3/resources/digita"
-
 # The FAQ database
 FAQ = Chroma(
     "faq",
@@ -166,49 +167,56 @@ def response(x:str) -> str:
 translate = TRANSLATE | chat | StrOutputParser() | response
 anonymize = ANON_RQ | chat | StrOutputParser() | response
 
-async def anon(rq: str, rsp: str) -> tuple[str, str, str]:
+async def anon(rq: str, rsp: str, sem: asyncio.Semaphore) -> tuple[str, str, str]:
     """Anonymize both a request and a response."""
-    trq = translate.ainvoke(rq)
-    trsp= translate.ainvoke(rsp)
+    async with sem:
+        trq = translate.ainvoke(rq)
+        trsp= translate.ainvoke(rsp)
 
-    trq = await trq
-    arq = anonymize.ainvoke(trq)
-    flow= (ROUTE_TO_FLOW | chat | StrOutputParser() | response).ainvoke(arq)
-    trsp= await trsp
-    arq = await arq
-    arsp= (ANON_RSP | chat | StrOutputParser() | response).ainvoke({
-        "request": trq,
-        "anon": arq,
-        "response": trsp,
-    })
+        trq = await trq
+        arq = anonymize.ainvoke(trq)
+        flow= (ROUTE_TO_FLOW | chat | StrOutputParser() | response).ainvoke(arq)
+        trsp= await trsp
+        arq = await arq
+        arsp= (ANON_RSP | chat | StrOutputParser() | response).ainvoke({
+            "request": trq,
+            "anon": arq,
+            "response": trsp,
+        })
 
-    flow = await flow
-    ctx  = None
-    match f:=flow.lower():
-        case _ if "genealogy" in f:
-            src = GENEALOGY.as_retriever(search_type="mmr", search_kwargs={"k":2})
-            prt = FIND_RELEVANT.format(input=arq)
-            ctx = await src.ainvoke(prt)
-            ctx = "\n\n".join([c.page_content for c in ctx])
-        case _ if "records" in f:
-            src = RECORDS.as_retriever(search_type="mmr", search_kwargs={"k":2})
-            prt = FIND_RELEVANT.format(input=arq)
-            ctx = await src.ainvoke(prt)
-            ctx = "\n\n".join([c.page_content for c in ctx])
-        case _: # faq
-            src = FAQ.as_retriever(search_type="mmr", search_kwargs={"k":2})
-            prt = FIND_SIMILAR.format(input=arq)
-            ctx = await src.ainvoke(prt)
-            ctx = "\n\n".join([c.metadata["fulltext"] for c in ctx])
+        flow = await flow
+        ctx  = None
+        match f:=flow.lower():
+            case _ if "genealogy" in f:
+                src = GENEALOGY.as_retriever(search_type="mmr", search_kwargs={"k":2})
+                prt = FIND_RELEVANT.format(input=arq)
+                ctx = await src.ainvoke(prt)
+                ctx = "\n\n".join([c.page_content for c in ctx])
+            case _ if "records" in f:
+                src = RECORDS.as_retriever(search_type="mmr", search_kwargs={"k":2})
+                prt = FIND_RELEVANT.format(input=arq)
+                ctx = await src.ainvoke(prt)
+                ctx = "\n\n".join([c.page_content for c in ctx])
+            case _: # faq
+                src = FAQ.as_retriever(search_type="mmr", search_kwargs={"k":2})
+                prt = FIND_SIMILAR.format(input=arq)
+                ctx = await src.ainvoke(prt)
+                ctx = "\n\n".join([c.metadata["fulltext"] for c in ctx])
 
-    arsp = await arsp
-    return (arq, arsp, ctx)
+        arsp = await arsp
+        return (arq, arsp, ctx)
 
 
-async def main():
-    results = await asyncio.gather(*(anon(row["request"], row["response"]) for _, row in df.iterrows()))
-    out     = pd.DataFrame.from_records(results, columns=["request", "response", "context"])
-    out.to_csv("anonymized.csv")
+async def main() -> None:
+    """Run the main entry point."""
+    with open("anonymized_2.csv", mode="w", encoding="utf8") as f:  # noqa: ASYNC230, PTH123
+        print("request,response,context", file=f)
+        semaphore = asyncio.Semaphore(value=3)
+        results   = asyncio.as_completed([anon(row["request"], row["response"], semaphore) for _, row in df[:20].iterrows()])
+        for count, result in enumerate(results):
+            req,rsp,ctx = await result
+            print(f'"{req}","{rsp}","{ctx}"', file=f)
+            print(count)  # noqa: T201
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -4,5 +4,9 @@ dataset de mon choix (typiquement la mailbox digita).
 
 ## Note
 Le projet est géré avec poetry. Tout devrait être super facile à gérer, mais si
-poetry n'est pas disponible: `pipx install poetry`. Après ca, un `poetry sync`
-ou `poetry install` devrait suffire.
+poetry n'est pas disponible: `pipx install poetry`. Après ca, un 
+`poetry sync --with laptop`, 
+`poetry sync --with ceci`,
+`poetry install --with laptop` 
+`poetry install --with ceci` 
+devrait suffire.

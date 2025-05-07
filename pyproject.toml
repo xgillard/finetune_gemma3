@@ -16,33 +16,26 @@ build-backend = "poetry.core.masonry.api"
 
 ############################ POETRY ####################################
 [tool.poetry]
-name        = "finetune-gemma3"
-version     = "0.1.0"
-description = "Fine tuning de Gemma 3 sur mon laptop (voir si ca marche)"
-authors     = [ "Xavier GILLARD <xavier.gillard@uclouvain.be>" ]
-packages    = [{include = "finetune_gemma3", from = "src"}]
+name          = "finetune-gemma3"
+version       = "0.1.0"
+description   = "Fine tuning de Gemma 3 sur mon laptop (voir si ca marche)"
+authors       = [ "Xavier GILLARD <xavier.gillard@uclouvain.be>" ]
+packages      = [{include = "finetune_gemma3", from = "src"}]
 
-#[[tool.poetry.source]]
-#name      = "pytorch-cuda"
-#url       = "https://download.pytorch.org/whl/cu128"
-#priority  = "supplemental"
+[[tool.poetry.source]]
+name          = "pytorch-cuda"
+url           = "https://download.pytorch.org/whl/cu128"
+priority      = "supplemental"
 
 [tool.poetry.dependencies]
-python       = ">=3.10,<3.12"
-## pytorch
-#torch        = { version = "^2.1",   source="pytorch-cuda" }
-#torchaudio  = { version = "~=2.5",  source="pytorch-cuda" }
-#torchvision = { version = "~=0.22", source="pytorch-cuda" }
-torch        = "=2.1.2"
-
 ## hugginface
-datasets     = ">=3.5.1,<4.0.0"
-tokenizers   = ">=0.21.1,<0.22.0"
-transformers = ">=4.51.3,<5.0.0"
-accelerate   = ">=1.6.0,<2.0.0"
-bitsandbytes = ">=0.45.5,<0.46.0"
-peft         = ">=0.15.2,<0.16.0"
-trl          = ">=0.17.0,<0.18.0"
+datasets      = ">=3.5.1,<4.0.0"
+tokenizers    = ">=0.21.1,<0.22.0"
+transformers  = ">=4.51.3,<5.0.0"
+accelerate    = ">=1.6.0,<2.0.0"
+bitsandbytes  = ">=0.45.5,<0.46.0"
+peft          = ">=0.15.2,<0.16.0"
+trl           = ">=0.17.0,<0.18.0"
 
 ## langchain
 langchain = "^0.3.25"
@@ -52,6 +45,20 @@ langchain-chroma = "^0.2.3"
 langchain-huggingface = "^0.1.2"
 
 chroma = "^0.2.0"
+
+############################ GROUPS ####################################
+[tool.poetry.group.laptop]
+optional = true
+
+[tool.poetry.group.laptop.dependencies]
+torch = { version = "^2.7", source="pytorch-cuda" }
+
+[tool.poetry.group.ceci]
+optional = true
+
+[tool.poetry.group.ceci.dependencies]
+python = ">=3.10,<3.12"
+torch  = "=2.1.2"
 
 ############################ RUFF ####################################
 [tool.ruff]
