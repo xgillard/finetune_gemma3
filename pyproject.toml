@@ -22,6 +22,11 @@ description   = "Fine tuning de Gemma 3 sur mon laptop (voir si ca marche)"
 authors       = [ "Xavier GILLARD <xavier.gillard@uclouvain.be>" ]
 packages      = [{include = "finetune_gemma3", from = "src"}]
 
+
+[[tool.poetry.source]]
+name          = "PyPI"
+priority      = "primary"
+
 [[tool.poetry.source]]
 name          = "pytorch-cuda"
 url           = "https://download.pytorch.org/whl/cu128"

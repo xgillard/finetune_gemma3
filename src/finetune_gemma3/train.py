@@ -27,9 +27,9 @@ output_dir    = "Llama-3.2-1B-Instruct-arkey_emails-qlora"
 modelname     = "meta-llama/Llama-3.2-1B-Instruct"
 epochs        = 5
 dset_path     = "./anonymized.csv"
-batch_size    = 32
+batch_size    = 8
 accumulation  = 10     # virtual batches of 320 samples
-checkpointing = False  # true si besoin de plus de ram.
+checkpointing = True  # true si besoin de plus de ram.
 
 ##### QUANTIZATION & MODEL LOADING ############################################
 bnb_config = BitsAndBytesConfig(
