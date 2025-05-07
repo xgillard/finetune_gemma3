@@ -1,6 +1,8 @@
 """Anonymize dataset."""
 import asyncio
+import csv
 import logging
+import sys
 
 import pandas as pd
 import torch
@@ -22,18 +24,20 @@ from transformers import (
     pipeline,
 )
 
-logging.getLogger("transformers").setLevel(logging.WARNING)
+modelname   = "meta-llama/Llama-3.2-3B-Instruct"
+dataset     = "./resources/mails_dataset_trim.csv"
+output_file = "anonymized.csv"
+max_concurr = 10
+__DIGITA   = "/home/ucl/pcom/gillardx/finetune_gemma3/resources/digita"
+#__DIGITA    = "./resources/digita"
+__DEVICE    = "cuda" if torch.cuda.is_available() else "cpu"
 
-modelname  = "meta-llama/Llama-3.2-3B-Instruct"
-dataset    = "./resources/mails_dataset_trim.csv"
-#__DIGITA   = "/home/ucl/pcom/gillardx/finetune_gemma3/resources/digita"
-__DIGITA   = "./resources/digita"
-__DEVICE   = "cuda" if torch.cuda.is_available() else "cpu"
+df         = pd.read_csv(dataset)  # noqa: PD901
 
-max_length = 1000
-
-df = pd.read_csv(dataset)  # noqa: PD901
-df = df[ (df["request"].str.len() <= max_length) & (df["response"].str.len() <= max_length) ]  # noqa: PD901
+### LOGGING ###################################################################
+log = logging.getLogger("progress")
+log.addHandler(logging.StreamHandler(sys.stdout))
+log.setLevel(logging.INFO)
 
 ### MODEL #####################################################################
 bnb_config = BitsAndBytesConfig(
@@ -110,7 +114,8 @@ ANON_RQ = ChatPromptTemplate.from_messages([
      Change mail address and/or phone whenever needed.
      Do not change the format of the email.
      Do not change city names.
-     Output anonymized email ONLY."""),
+     Output anonymized email ONLY (no intro, no outro. For instance, don't tell me "Here is the anonymized email: ...").
+     """),
      ("human", "{input}"),
 ])
 ANON_RSP = ChatPromptTemplate.from_messages([
@@ -122,7 +127,8 @@ ANON_RSP = ChatPromptTemplate.from_messages([
      Change mail address and/or phone whenever needed.
      Do not change the format of the email.
      Do not change city names.
-     Output anonymized email ONLY."""),
+     Output anonymized email ONLY (no intro, no outro. For instance, don't tell me "Here is the anonymized email: ...").
+     """),
      ("human", "{request}"),
      ("ai", "{anon}"),
      ("system", """
@@ -209,14 +215,16 @@ async def anon(rq: str, rsp: str, sem: asyncio.Semaphore) -> tuple[str, str, str
 
 async def main() -> None:
     """Run the main entry point."""
-    with open("anonymized_2.csv", mode="w", encoding="utf8") as f:  # noqa: ASYNC230, PTH123
-        print("request,response,context", file=f)
-        semaphore = asyncio.Semaphore(value=3)
-        results   = asyncio.as_completed([anon(row["request"], row["response"], semaphore) for _, row in df[:20].iterrows()])
+    with open(output_file, mode="w", encoding="utf8") as f:  # noqa: ASYNC230, PTH123
+        semaphore = asyncio.Semaphore(value=max_concurr)
+        writer    = csv.writer(f)
+        results   = asyncio.as_completed([anon(row["request"], row["response"], semaphore) for _, row in df.iterrows()])
+        #results   = asyncio.as_completed([anon(row["request"], row["response"], semaphore) for _, row in df[:3].iterrows()])
+        writer.writerow(["request","response","context"])
         for count, result in enumerate(results):
             req,rsp,ctx = await result
-            print(f'"{req}","{rsp}","{ctx}"', file=f)
-            print(count)  # noqa: T201
+            writer.writerow([req, rsp, ctx])
+            log.info("progress %5d", count)
 
 if __name__ == "__main__":
     asyncio.run(main())
