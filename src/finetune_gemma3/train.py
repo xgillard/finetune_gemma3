@@ -109,3 +109,4 @@ trainer.train()
 
 model.save_pretrained(f"final/{output_dir}")
 model.push_to_hub(f"xaviergillard/{output_dir}")
+trainer.push_to_hub()
