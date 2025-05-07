@@ -23,8 +23,8 @@ from transformers import (
     TrainingArguments,
 )
 
-output_dir    = "Llama-3.2-3B-Instruct-arkey_emails-qlora"
-modelname     = "meta-llama/Llama-3.2-3B-Instruct"
+output_dir    = "Llama-3.2-1B-Instruct-arkey_emails-qlora"
+modelname     = "meta-llama/Llama-3.2-1B-Instruct"
 epochs        = 5
 dset_path     = "./anonymized.csv"
 batch_size    = 32
@@ -77,7 +77,7 @@ def tokenize(sample):  # noqa: ANN001, ANN201
 dataset = Dataset.from_csv("./resources/mails_dataset.csv")
 dataset = dataset.map(tokenize, batched=False)
 
-shards  = dataset.shuffle(seed=42).train_test_split(test_size=0.2)
+shards  = dataset.shuffle(seed=42).train_test_split(test_size=0.1)
 trainds = shards["train"]
 evalds  = shards["test"]
 
