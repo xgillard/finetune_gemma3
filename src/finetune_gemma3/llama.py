@@ -23,8 +23,8 @@ from transformers import (
     TrainingArguments,
 )
 
-output_dir    = "gemma-3-1b-it-arkey_emails-qlora"
-modelname     = "google/gemma-3-1b-it"
+output_dir    = "Llama-3.2-1B-Instruct-arkey_emails-qlora"
+modelname     = "meta-llama/Llama-3.2-1B-Instruct"
 epochs        = 10
 dset_path     = "./anonymized.csv"
 batch_size    = 8

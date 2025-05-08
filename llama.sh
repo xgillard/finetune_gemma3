@@ -5,7 +5,7 @@
 ###
 
 # Submission script for Manneback
-#SBATCH --job-name=finetune
+#SBATCH --job-name=llama
 #SBATCH --time=20:00:00 # hh:mm:ss
 #
 ## MORE INFO HERE:
@@ -16,7 +16,7 @@
 #SBATCH --partition=gpu
 #SBATCH --mail-user=xavier.gillard@uclouvain.be
 #SBATCH --mail-type=ALL
-#SBATCH --output=out.txt
+#SBATCH --output=llama.txt
 
 module --force purge
 module --ignore_cache load              \
@@ -28,5 +28,5 @@ module --ignore_cache load              \
 . .venv/bin/activate
 poetry config virtualenvs.options.system-site-packages true --local
 #srun poetry run python -m finetune_gemma3.anonymize
-srun poetry run python -m finetune_gemma3.train
+srun poetry run python -m finetune_gemma3.llama
 
